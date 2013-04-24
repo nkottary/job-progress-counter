@@ -9,11 +9,11 @@
 		<h4>Click to download</h4>
 		<table border = "1">
 			<tr>
-				<th>Job ID</th><th>Time</th><th>Job Progress</th><th>Status</th>
+				<th>Job ID</th><th>Name</th><th>Time</th><th>Job Progress</th><th>Status</th>
 			</tr>
 			{% for job in jobs %}
 			<tr>
-				<td>{{job.key.id}}</td><td>{{job.time_started}}</td><td>{{job.progress}}</td>
+				<td>{{job.key.id}}</td><td>{{job.name}}</td><td>{{job.time_started}}</td><td>{{job.progress}}</td>
 				{% if job.completed %}
 					<td><a href = "/serve/{{job.output_file.key}}">Completed</td>
 				{% endif %}

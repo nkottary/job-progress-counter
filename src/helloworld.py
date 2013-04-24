@@ -1,4 +1,5 @@
 from __future__ import with_statement
+from matrix import *
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
@@ -14,6 +15,7 @@ import logging
 
 class Job(db.Model):
     
+    name = db.StringProperty()
     progress = db.IntegerProperty(default = 0)
     time_started = db.DateTimeProperty(auto_now_add = True)
     completed = db.BooleanProperty(default = False)
@@ -22,19 +24,28 @@ class Job(db.Model):
 
 def run_thread(identity):
     job = Job.get_by_id(identity)
-    while job.progress < 10:#Constants.JOB_COMPLETED_TIME:
-        time.sleep(2)
-        job.progress += 1
-        job.put()
     # Create the file
     file_name = files.blobstore.create(mime_type='text/plain')
     
     # Open the file and write to it
     with files.open(file_name, 'a') as f:
+        #read from data_file
         blob_reader = blobstore.BlobReader(job.data_file)
         value = blob_reader.read()
-        logging.info(str(value))
-        f.write(value)
+        
+        #multiply
+        matrix = str_to_matrix(value)
+        while job.progress < 10000:
+            #time.sleep(1)
+            try:
+                matrix = matrix_mult(matrix,matrix)
+            except Exception as e:
+                logging.info("error: "+str(e))
+            job.progress += 1
+            job.put()
+        
+        #write 
+        f.write(matrix_to_str(matrix))
     
     # Finalize the file. Do this before attempting to read it.
     files.finalize(file_name)
@@ -65,6 +76,10 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         upload_files = self.get_uploads('file')  # 'file' is file upload field in the form
         blob_info = upload_files[0]
         job = Job(data_file = blob_info.key())
+        if self.request.get('name') is not None:
+            job.name = self.request.get('name')
+        else:
+            job.name = "Untitled"
         job.put()
         run_it(job.key().id())
         self.redirect('/')
@@ -87,14 +102,14 @@ class Results(webapp.RequestHandler):
     
     def get(self):
         
-        jobs =  {'jobs': db.GqlQuery("SELECT * FROM Job")}
+        jobs =  {'jobs': db.GqlQuery("SELECT * FROM Job ORDER BY time_started")}
         self.response.out.write(template.render('results.html', jobs))
         
 class DownloadPage(webapp.RequestHandler):
     
     def get(self):
         
-        jobs = {'jobs': db.GqlQuery("SELECT * FROM Job WHERE completed = TRUE")}
+        jobs = {'jobs': db.GqlQuery("SELECT * FROM Job WHERE completed = TRUE ORDER BY time_started")}
         self.response.out.write(template.render('download.html', jobs))
         
 application = webapp.WSGIApplication([('/', UploadPage),('/results', Results),('/progress',ProgressPage),

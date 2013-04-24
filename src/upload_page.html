@@ -7,7 +7,24 @@
 		<a href = "/download">Download</a>
 		<h1>Submit file</h1>
 		<form action="{{upload_url}}" method="POST" enctype="multipart/form-data">
-		Upload File: <input type="file" name="file"><br> <input type="submit"
-            name="submit" value="Submit"> </form>
+		<p>Name: (for your convenience) <input type = "text" name = "name" /></p>
+		<p>Upload File: <input type="file" name="file" id = "file"><br> <input type="submit" onclick = "check();"
+            name="submit" value="Submit"></p> </form>
+          <p id = "info"></p>
 	</body>
+	<script>
+	function check()
+	{
+		if(document.getElementBy('file').value == "")
+		{
+			alert("Error: Please Chose a file");
+			return false;
+		}
+		else
+		{
+			document.getElementById('info').innerHTML = "your file has been uploaded";
+		}
+		return false;
+	}
+	</script>
 </html>
