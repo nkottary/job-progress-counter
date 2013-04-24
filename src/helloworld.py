@@ -1,23 +1,24 @@
+from __future__ import with_statement
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
 from google.appengine.ext import db
 from google.appengine.ext import blobstore
-from google.appengine.api import background_thread
+from google.appengine.ext.webapp import blobstore_handlers
+from google.appengine.api import files
+
 import thread
 import time
+import urllib
 import logging
-
-'''class Constants():
-    
-    DELAY = 5
-    JOB_COMPLETE_TIME = 10'''
 
 class Job(db.Model):
     
     progress = db.IntegerProperty(default = 0)
     time_started = db.DateTimeProperty(auto_now_add = True)
     completed = db.BooleanProperty(default = False)
+    data_file = blobstore.BlobReferenceProperty(required = True)
+    output_file = blobstore.BlobReferenceProperty()
 
 def run_thread(identity):
     job = Job.get_by_id(identity)
@@ -25,6 +26,23 @@ def run_thread(identity):
         time.sleep(2)
         job.progress += 1
         job.put()
+    # Create the file
+    file_name = files.blobstore.create(mime_type='text/plain')
+    
+    # Open the file and write to it
+    with files.open(file_name, 'a') as f:
+        blob_reader = blobstore.BlobReader(job.data_file)
+        value = blob_reader.read()
+        logging.info(str(value))
+        f.write(value)
+    
+    # Finalize the file. Do this before attempting to read it.
+    files.finalize(file_name)
+    
+    # Get the file's blob key
+    blob_key = files.blobstore.get_blob_key(file_name)
+    
+    job.output_file = blob_key
     job.completed = True
     job.put()
         
@@ -37,17 +55,27 @@ class UploadPage(webapp.RequestHandler):
     def get(self):
         #self.response.headers['Content-Type'] = 'text/plain'
         #jobs =  {'jobs': db.GqlQuery("SELECT * FROM Job")}
-        self.response.out.write(template.render('upload_page.html', {}))
+        upload_url = {'upload_url': blobstore.create_upload_url('/upload')}
+        self.response.out.write(template.render('upload_page.html', upload_url))
+        
+class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
     
     def post(self):
         
-        job = Job()
+        upload_files = self.get_uploads('file')  # 'file' is file upload field in the form
+        blob_info = upload_files[0]
+        job = Job(data_file = blob_info.key())
         job.put()
-        
-        #t = background_thread.BackgroundThread(target= run_thread, args=[job.key().id(),])
-        #t.start()
         run_it(job.key().id())
-        self.redirect('/progress')
+        self.redirect('/')
+        #self.redirect('/serve/%s' % blob_info.key())
+        
+class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler):
+    
+    def get(self, resource):
+        resource = str(urllib.unquote(resource))
+        blob_info = blobstore.BlobInfo.get(resource)
+        self.send_blob(blob_info)
 
 class ProgressPage(webapp.RequestHandler):
     
@@ -69,8 +97,9 @@ class DownloadPage(webapp.RequestHandler):
         jobs = {'jobs': db.GqlQuery("SELECT * FROM Job WHERE completed = TRUE")}
         self.response.out.write(template.render('download.html', jobs))
         
-application = webapp.WSGIApplication([('/', UploadPage),('/results', Results),('/progress',ProgressPage),('/download',DownloadPage)], debug=True)
-upload_url = blobstore.create_upload_url('/upload')
+application = webapp.WSGIApplication([('/', UploadPage),('/results', Results),('/progress',ProgressPage),
+                                      ('/download',DownloadPage), ('/upload', UploadHandler),
+                               ('/serve/([^/]+)?', ServeHandler)], debug=True)
 
 def main():
     run_wsgi_app(application)

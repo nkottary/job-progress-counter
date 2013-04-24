@@ -14,8 +14,8 @@
 			{% for job in jobs %}
 			<tr>
 				<td>{{job.key.id}}</td><td>{{job.time_started}}</td><td>{{job.progress}}</td>
-				{% if job.completed%}
-					<td>Completed</td>
+				{% if job.completed %}
+					<td><a href = "/serve/{{job.output_file.key}}">Completed</td>
 				{% endif %}
 			</tr>
 			{% endfor %}
