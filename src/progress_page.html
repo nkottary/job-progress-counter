@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+	<body>
+		<h2>Navigation</h2>
+		<a href = "/">Upload</a>
+		<a href = "/progress">Progress</a>
+		<a href = "/download">Download</a>
+		<h1>Progress</h1>
+		<hr />
+		<table id = "mytable" border = "1">
+		</table>
+		<script>
+		function polling()
+		{
+			if (window.XMLHttpRequest)
+			{
+			 	xmlhttp=new XMLHttpRequest();
+			}
+			
+			xmlhttp.onreadystatechange=function(){
+			
+			  		if(xmlhttp.readyState==4 && xmlhttp.status==200)
+			    	{
+			    		document.getElementById("mytable").innerHTML=xmlhttp.responseText;
+			    	}
+			  	
+			  	}
+			  	
+			xmlhttp.open("GET","/results");
+			xmlhttp.send();
+		}
+		setInterval("polling();",2000);
+		</script>
+	</body>
+</html>

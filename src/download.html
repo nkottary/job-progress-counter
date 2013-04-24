@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+	<body>
+		<h2>Navigation</h2>
+		<a href = "/">Upload</a>
+		<a href = "/progress">Progress</a>
+		<a href = "/download">Download</a>
+		<h1>Below is list of files whose status is completed</h1>
+		<h4>Click to download</h4>
+		<table border = "1">
+			<tr>
+				<th>Job ID</th><th>Time</th><th>Job Progress</th><th>Status</th>
+			</tr>
+			{% for job in jobs %}
+			<tr>
+				<td>{{job.key.id}}</td><td>{{job.time_started}}</td><td>{{job.progress}}</td>
+				{% if job.completed%}
+					<td>Completed</td>
+				{% endif %}
+			</tr>
+			{% endfor %}
+		</table>
+	</body>
+</html>
