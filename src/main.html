@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+	<head><title>Job progress Counter</title></head>
+	<body>
+	
+		<h1>Job progress Counter</h1>
+		<form action = "" method = "post">
+			<input id = "send-btn" type = "submit" value = "Send"/>
+		</form>
+		
+		<h2>Progress</h2>
+		<hr />
+		<table border = "1">
+			<tr>
+				<th>Job ID</th><th>Time</th><th>Job Progress</th>
+			</tr>
+			{% for job in jobs %}
+			<tr>
+				<td>{{job.key}}</td><td>{{job.time}}</td><td>{{job.progress}}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</body>
+	<script src = "jquery.js"></script>
+	<script>
+		$(document).ready(
+			function(){
+				
+			}
+		)
+	</script>
+</html>
+<!--
+<html>
+<head>
+<script>
+function getVote(int)
+{
+if (window.XMLHttpRequest)
+  {// code for IE7+, Firefox, Chrome, Opera, Safari
+  xmlhttp=new XMLHttpRequest();
+  }
+else
+  {// code for IE6, IE5
+  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+  }
+xmlhttp.onreadystatechange=function()
+  {
+  if (xmlhttp.readyState==4 && xmlhttp.status==200)
+    {
+    document.getElementById("poll").innerHTML=xmlhttp.responseText;
+    }
+  }
+xmlhttp.open("GET","poll_vote.php?vote="+int,true);
+xmlhttp.send();
+}
+</script>
+</head>
+<body>
+
+<div id="poll">
+<h3>Do you like PHP and AJAX so far?</h3>
+<form>
+Yes:
+<input type="radio" name="vote" value="0" onclick="getVote(this.value)">
+<br>No:
+<input type="radio" name="vote" value="1" onclick="getVote(this.value)">
+</form>
+</div>
+
+</body>
+</html>-->
