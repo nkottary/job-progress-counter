@@ -3,7 +3,7 @@
 </tr>
 {% for job in jobs %}
 <tr>
-	<td>{{job.key}}</td><td>{{job.time_started}}</td><td>{{job.progress}}</td>
+	<td>{{job.key.id}}</td><td>{{job.time_started}}</td><td>{{job.progress}}</td>
 	{% if job.completed%}
 		<td>Completed</td>
 	{% endif %}
