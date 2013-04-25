@@ -1,11 +1,24 @@
+
 <tr>
-	<th>Job ID</th><th>Name</th><th>Time</th><th>Job Progress</th><th>Status</th>
+	<th>Job ID</th><th>Name</th><th>Start Time</th><th>Status</th>
 </tr>
 {% for job in jobs %}
 <tr>
-	<td>{{job.key.id}}</td><td>{{job.name}}</td><td>{{job.time_started}}</td><td>{{job.progress}}</td>
-	{% if job.completed%}
-		<td>Completed</td>
+	<td>{{job.key.id}}</td><td>{{job.name}}</td><td>{{job.time_started}}</td>
+	<td>
+	{% if job.completed %}
+		Completed
+	{% else %}
+		Processing...
 	{% endif %}
+	</td>
+</tr>
+<tr>
+	<td>Job Progress</td>
+	<td colspan = "3">
+		<div class="progress progress-striped active">
+  			<div class="bar" style="width: {{job.normalized_progress}}%;">{{job.normalized_progress}}%</div>
+		</div>
+	</td>
 </tr>
 {% endfor %}

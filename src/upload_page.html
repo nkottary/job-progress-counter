@@ -1,16 +1,50 @@
 <!DOCTYPE html>
 <html>
+	<link rel = "stylesheet" type = "text/css" href = "stylesheets/bootstrap.css">
+	<link rel = "stylesheet" type = "text/css" href = "stylesheets/common.css">
 	<body>
-		<h2>Navigation</h2>
-		<a href = "/">Upload</a>
-		<a href = "/progress">Progress</a>
-		<a href = "/download">Download</a>
-		<h1>Submit file</h1>
-		<form action="{{upload_url}}" method="POST" enctype="multipart/form-data">
-		<p>Name: (for your convenience) <input type = "text" name = "name" /></p>
-		<p>Upload File: <input type="file" name="file" id = "file"><br> <input type="submit" onclick = "check();"
-            name="submit" value="Submit"></p> </form>
-          <p id = "info"></p>
+		<div class = "hero-unit" id = "imp">
+			<h1>JOB PROGRESS COUNTER</h1>
+		</div>
+		<div class = "container">
+			<div class="navbar">
+			  <div class="navbar-inner">
+			    <ul class="nav">
+			    	<li><a href="/">Main Page</a></li>
+			      <li class="active"><a href="/submit">Upload</a></li>
+			      <li><a href = "/progress">Progress</a></li>
+			      <li><a href = "/download">Download</a></li>
+			    </ul>
+			  </div>
+			</div>
+		</div>
+		<div class = "hero-unit our-panel">
+			<h2>Upload File</h2>
+			<br />
+			<form action="{{upload_url}}" method="POST" enctype="multipart/form-data">
+			<table class = "table">
+			<tr>
+			<td>Name: (optional)</td><td> <input type = "text" name = "name" /></td>
+			</tr>
+			<tr>
+	          <td>Repetitions:</td> 
+	          <td>100 <input type = "radio" name = "repetitions" value = "100" checked/>
+	          1,000 <input type = "radio" name = "repetitions" value = "1000" />
+	          10,000 <input type = "radio" name = "repetitions" value = "10000" /></td>
+	        </tr>
+	        <tr>
+			<td>Upload File:</td><td> 
+			<input type="file" name="file" id = "file"><br> 
+			</td>
+			<tr>
+			<td></td>
+			<td><input type="submit" onclick = "check();"
+	            name="submit" value="Submit"></td>
+	         </tr>
+	         </table>
+	           </form>
+	          <p id = "info"></p>
+          </div>
 	</body>
 	<script>
 	function check()

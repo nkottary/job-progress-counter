@@ -1,24 +1,50 @@
 <!DOCTYPE html>
 <html>
+	<link rel = "stylesheet" type = "text/css" href = "stylesheets/bootstrap.css">
+	<link rel = "stylesheet" type = "text/css" href = "stylesheets/common.css">
 	<body>
-		<h2>Navigation</h2>
-		<a href = "/">Upload</a>
-		<a href = "/progress">Progress</a>
-		<a href = "/download">Download</a>
-		<h1>Below is list of files whose status is completed</h1>
-		<h4>Click to download</h4>
-		<table border = "1">
-			<tr>
-				<th>Job ID</th><th>Name</th><th>Time</th><th>Job Progress</th><th>Status</th>
-			</tr>
-			{% for job in jobs %}
-			<tr>
-				<td>{{job.key.id}}</td><td>{{job.name}}</td><td>{{job.time_started}}</td><td>{{job.progress}}</td>
-				{% if job.completed %}
-					<td><a href = "/serve/{{job.output_file.key}}">Completed</td>
-				{% endif %}
-			</tr>
-			{% endfor %}
-		</table>
+		<div class = "hero-unit" id = "imp">
+			<h1>JOB PROGRESS COUNTER</h1>
+		</div>
+		<div class = "container">
+			<div class="navbar">
+			  <div class="navbar-inner">
+			    <ul class="nav">
+			    <li><a href="/">Main Page</a></li>
+			      <li><a href="/submit">Upload</a></li>
+			      <li><a href = "/progress">Progress</a></li>
+			      <li class="active"><a href = "/download">Download</a></li>
+			    </ul>
+			  </div>
+			</div>
+		</div>
+		<div class = "hero-unit our-panel">
+			<h2>Download</h2>
+			<h4>Right click on link and select save link as</h4>
+			<table id = "mytable" class = "table table-hover">
+			</table>
+		</div>
 	</body>
+	<script>
+		function polling()
+		{
+			if (window.XMLHttpRequest)
+			{
+			 	xmlhttp=new XMLHttpRequest();
+			}
+			
+			xmlhttp.onreadystatechange=function(){
+			
+			  		if(xmlhttp.readyState==4 && xmlhttp.status==200)
+			    	{
+			    		document.getElementById("mytable").innerHTML=xmlhttp.responseText;
+			    	}
+			  	
+			  	}
+			  	
+			xmlhttp.open("GET","/download_results");
+			xmlhttp.send();
+		}
+		setInterval("polling();",2000);
+		</script>
 </html>
